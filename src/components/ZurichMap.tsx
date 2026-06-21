@@ -2,21 +2,24 @@ import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import type { GeoPermissibleObjects } from 'd3'
 import { getBreedColor, getContrastColor, PALETTE } from '../data/palette'
-import type { DistrictCollection, DistrictDogStats, DistrictFeature } from '../types/geo'
+import type { DistrictCollection, DistrictDogStats, DistrictFeature, LakeFeature } from '../types/geo'
 
-function asGeoObject(value: DistrictCollection | DistrictFeature): GeoPermissibleObjects {
+function asGeoObject(
+  value: DistrictCollection | DistrictFeature | LakeFeature,
+): GeoPermissibleObjects {
   return value as unknown as GeoPermissibleObjects
 }
 
 interface ZurichMapProps {
   geojson: DistrictCollection
+  lakeGeojson: LakeFeature | null
   districtStats: DistrictDogStats[]
   selectedDistrictId: number | null
   onHover: (district: DistrictFeature | null, position: { x: number; y: number } | null) => void
   onSelect: (district: DistrictFeature | null, position: { x: number; y: number } | null) => void
 }
 
-export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover, onSelect }: ZurichMapProps) {
+export function ZurichMap({ geojson, lakeGeojson, districtStats, selectedDistrictId, onHover, onSelect }: ZurichMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const onHoverRef = useRef(onHover)
@@ -76,6 +79,20 @@ export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover,
         )
 
       const path = d3.geoPath().projection(projection)
+
+      if (lakeGeojson) {
+        svg
+          .append('path')
+          .attr('class', 'lake')
+          .datum(asGeoObject(lakeGeojson))
+          .attr('d', (feature) => path(feature) ?? '')
+          .attr('fill', PALETTE.water)
+          .attr('stroke', PALETTE.accent)
+          .attr('stroke-width', 0.35)
+          .attr('opacity', 0.85)
+          .attr('pointer-events', 'none')
+      }
+
       const root = svg.append('g').attr('class', 'districts')
 
       root
@@ -145,7 +162,7 @@ export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover,
       observer.disconnect()
       container.removeEventListener('mouseleave', handleContainerLeave)
     }
-  }, [geojson, districtStats, selectedDistrictId])
+  }, [geojson, lakeGeojson, districtStats, selectedDistrictId])
 
   return (
     <div ref={containerRef} className="map-container">

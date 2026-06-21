@@ -1,3 +1,21 @@
+export interface LakeProperties {
+  name: string
+}
+
+export interface LakeFeature {
+  type: 'Feature'
+  geometry: {
+    type: 'Polygon' | 'MultiPolygon'
+    coordinates: number[][][] | number[][][][]
+  }
+  properties: LakeProperties
+}
+
+export interface LakeCollection {
+  type: 'FeatureCollection'
+  features: LakeFeature[]
+}
+
 export interface DistrictProperties {
   bezeichnung: string
   name: number
