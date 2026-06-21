@@ -23,8 +23,9 @@ import type {
 } from '../types/geo'
 
 const TITLE = 'Dogs of Zurich'
-const SUBTITLE =
-  'Zurich has 12 districts, or formally known as "Kreise". As you explore this map, each district will show its most common breed.'
+const SUBTITLE_INTRO = 'Zurich has 12 districts, or formally known as "Kreise".'
+const SUBTITLE_DETAIL =
+  'As you explore this map, each district will show its most common breed.'
 
 interface DistrictState {
   district: DistrictFeature
@@ -133,10 +134,14 @@ export function Visualization() {
     <div className="visualization">
       <header className="visualization-header">
         <h1>{TITLE}</h1>
-        <p>{SUBTITLE}</p>
+        <p>
+          {SUBTITLE_INTRO}
+          <br />
+          {SUBTITLE_DETAIL}
+        </p>
         {dataset && (
           <p className="visualization-data-note">
-            Based on {formatCount(dataset.totalRecords)} registered dogs recorded in{' '}
+            This dataset is based on {formatCount(dataset.totalRecords)} registered dogs recorded in{' '}
             {dataset.referenceYear}.
           </p>
         )}
@@ -147,11 +152,16 @@ export function Visualization() {
 
       {geojson && dataset && filters && (
         <section className="map-section" aria-label="District map">
+          <img
+            src="/Dogsilhouette.png"
+            alt=""
+            className="map-dog-silhouette"
+            aria-hidden="true"
+          />
           <div className="map-main">
-            <div className="map-controls">
-              <GenderToggle value={genderFilter} onChange={setGenderFilter} />
-              <MixedBreedToggle checked={includeMixedBreeds} onChange={setIncludeMixedBreeds} />
-            </div>
+            <aside className="map-legend-panel">
+              <BreedLegend breeds={legendBreeds} />
+            </aside>
             <ZurichMap
               geojson={geojson}
               districtStats={districtStats}
@@ -179,15 +189,20 @@ export function Visualization() {
             )}
           </div>
 
-          <BreedLegend breeds={legendBreeds} />
-          <FilterSliders
-            filters={filters}
-            extents={dataset.ageExtents}
-            ownerAgeGroups={dataset.ownerAgeGroups}
-            matchedCount={filteredRecords.length}
-            onChange={setFilters}
-            onReset={() => setFilters(createDefaultFilters(dataset))}
-          />
+          <div className="controls-panel">
+            <div className="map-controls">
+              <GenderToggle value={genderFilter} onChange={setGenderFilter} />
+              <MixedBreedToggle checked={includeMixedBreeds} onChange={setIncludeMixedBreeds} />
+            </div>
+            <FilterSliders
+              filters={filters}
+              extents={dataset.ageExtents}
+              ownerAgeGroups={dataset.ownerAgeGroups}
+              matchedCount={filteredRecords.length}
+              onChange={setFilters}
+              onReset={() => setFilters(createDefaultFilters(dataset))}
+            />
+          </div>
         </section>
       )}
     </div>

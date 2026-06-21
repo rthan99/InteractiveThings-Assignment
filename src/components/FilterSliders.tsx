@@ -130,7 +130,9 @@ function DiscreteDualRangeSlider({ label, range, extents, onChange }: DiscreteDu
               setActiveThumb('min')
             }}
             onKeyDown={handleKeyDown('min')}
-          />
+          >
+            {range.min}
+          </button>
           <button
             type="button"
             role="slider"
@@ -145,15 +147,9 @@ function DiscreteDualRangeSlider({ label, range, extents, onChange }: DiscreteDu
               setActiveThumb('max')
             }}
             onKeyDown={handleKeyDown('max')}
-          />
-        </div>
-        <div className="discrete-range-labels">
-          <span className="discrete-range-value" style={{ left: `${minPercent}%` }}>
-            {range.min}
-          </span>
-          <span className="discrete-range-value" style={{ left: `${maxPercent}%` }}>
+          >
             {range.max}
-          </span>
+          </button>
         </div>
       </div>
     </div>
@@ -179,9 +175,14 @@ function OwnerAgeGroupCheckboxes({ groups, selected, onChange }: OwnerAgeGroupCh
   return (
     <div className="age-filter owner-age-filter">
       <span className="age-filter-label">Owner age</span>
-      <div className="owner-age-groups" role="group" aria-label="Owner age groups">
+      <div
+        className="owner-age-groups"
+        role="group"
+        aria-label="Owner age groups"
+        style={{ gridTemplateRows: `repeat(${Math.ceil(groups.length / 3)}, auto)` }}
+      >
         {groups.map((group) => (
-          <label key={group} className="owner-age-option">
+          <label key={group} className="selection-chip owner-age-chip">
             <input
               type="checkbox"
               checked={selectedSet.has(group)}

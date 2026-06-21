@@ -13,8 +13,8 @@ interface GenderToggleProps {
 
 export function GenderToggle({ value, onChange }: GenderToggleProps) {
   return (
-    <fieldset className="gender-toggle map-control">
-      <legend className="gender-toggle-label">Dog gender</legend>
+    <div className="age-filter gender-filter">
+      <span className="age-filter-label">Dog gender</span>
       <div className="gender-toggle-options" role="radiogroup" aria-label="Dog gender">
         {OPTIONS.map((option) => (
           <label key={option.value} className="gender-toggle-option">
@@ -29,6 +29,6 @@ export function GenderToggle({ value, onChange }: GenderToggleProps) {
           </label>
         ))}
       </div>
-    </fieldset>
+    </div>
   )
 }
