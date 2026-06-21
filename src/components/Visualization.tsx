@@ -24,7 +24,7 @@ import type {
 
 const TITLE = 'Dogs of Zurich'
 const SUBTITLE =
-  'Zurich has 12 districts, or more locally known as "Kreise". As you explore this map, each district will show its most common breed.'
+  'Zurich has 12 districts, or formally known as "Kreise". As you explore this map, each district will show its most common breed.'
 
 interface DistrictState {
   district: DistrictFeature

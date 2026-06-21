@@ -64,6 +64,7 @@
 .breed-legend-title {
   margin: 0 0 0.45rem;
   font-size: 0.82rem;
+  font-weight: 700;
   color: var(--color-text);
 }
 
