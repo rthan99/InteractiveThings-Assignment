@@ -16,7 +16,7 @@ import type { AgeFilters, DistrictCollection, DistrictFeature, DogDataset } from
 
 const TITLE = 'Dogs of Zurich'
 const SUBTITLE =
-  'Each district shows its most common breed. Filter by dog age and owner age group.'
+  'Zurich has 12 districts, or more locally known as "Kreise". As you explore this map, each district will show its most common breed.'
 
 interface DistrictState {
   district: DistrictFeature
