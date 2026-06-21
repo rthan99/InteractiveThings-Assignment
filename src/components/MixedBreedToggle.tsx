@@ -5,7 +5,7 @@ interface MixedBreedToggleProps {
 
 export function MixedBreedToggle({ checked, onChange }: MixedBreedToggleProps) {
   return (
-    <label className="mixed-breed-toggle map-mixed-breed-toggle">
+    <label className="mixed-breed-toggle map-control">
       <input
         type="checkbox"
         checked={checked}

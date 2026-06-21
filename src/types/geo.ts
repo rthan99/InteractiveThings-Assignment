@@ -30,11 +30,16 @@ export interface AgeFilters {
   ownerAgeGroups: string[]
 }
 
+export type DogSex = 'male' | 'female'
+
+export type DogGenderFilter = 'both' | DogSex
+
 export interface DogRecord {
   district: number
   breedPrimary: string
   ownerAgeGroup: string
   dogAge: number
+  gender: DogSex
 }
 
 export interface AgeExtents {

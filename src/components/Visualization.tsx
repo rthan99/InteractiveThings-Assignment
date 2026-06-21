@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BreedLegend } from './BreedLegend'
+import { GenderToggle } from './GenderToggle'
 import { MixedBreedToggle } from './MixedBreedToggle'
 import { DistrictBreedChart } from './DistrictBreedChart'
 import { FilterSliders } from './FilterSliders'
@@ -8,11 +9,12 @@ import {
   computeDistrictStats,
   createDefaultFilters,
   filterRecords,
+  filterByGender,
   filterMixedBreeds,
   loadDogDataset,
 } from '../data/parseDogData'
 import { formatCount } from '../formatCount'
-import type { AgeFilters, DistrictCollection, DistrictFeature, DogDataset } from '../types/geo'
+import type { AgeFilters, DistrictCollection, DistrictFeature, DogDataset, DogGenderFilter } from '../types/geo'
 
 const TITLE = 'Dogs of Zurich'
 const SUBTITLE =
@@ -29,6 +31,7 @@ export function Visualization() {
   const [dataset, setDataset] = useState<DogDataset | null>(null)
   const [filters, setFilters] = useState<AgeFilters | null>(null)
   const [includeMixedBreeds, setIncludeMixedBreeds] = useState(true)
+  const [genderFilter, setGenderFilter] = useState<DogGenderFilter>('both')
   const [hovered, setHovered] = useState<DistrictState | null>(null)
   const [selected, setSelected] = useState<DistrictState | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -56,9 +59,14 @@ export function Visualization() {
     return filterRecords(dataset.records, filters)
   }, [dataset, filters])
 
+  const genderFilteredRecords = useMemo(
+    () => filterByGender(ageFilteredRecords, genderFilter),
+    [ageFilteredRecords, genderFilter],
+  )
+
   const filteredRecords = useMemo(
-    () => filterMixedBreeds(ageFilteredRecords, includeMixedBreeds),
-    [ageFilteredRecords, includeMixedBreeds],
+    () => filterMixedBreeds(genderFilteredRecords, includeMixedBreeds),
+    [genderFilteredRecords, includeMixedBreeds],
   )
 
   const districtStats = useMemo(
@@ -134,7 +142,10 @@ export function Visualization() {
       {geojson && dataset && filters && (
         <section className="map-section" aria-label="District map">
           <div className="map-main">
-            <MixedBreedToggle checked={includeMixedBreeds} onChange={setIncludeMixedBreeds} />
+            <div className="map-controls">
+              <GenderToggle value={genderFilter} onChange={setGenderFilter} />
+              <MixedBreedToggle checked={includeMixedBreeds} onChange={setIncludeMixedBreeds} />
+            </div>
             <ZurichMap
               geojson={geojson}
               districtStats={districtStats}
@@ -144,7 +155,7 @@ export function Visualization() {
             />
             {filteredRecords.length === 0 && (
               <div className="map-empty-state" role="status">
-                No dogs match the current filters. Adjust the filters, mixed breed setting, or reset
+                No dogs match the current filters. Adjust the filters, gender, mixed breed setting, or reset
                 filters below.
               </div>
             )}

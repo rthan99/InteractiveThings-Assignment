@@ -4,7 +4,9 @@ import type {
   AgeRange,
   DistrictDogStats,
   DogDataset,
+  DogGenderFilter,
   DogRecord,
+  DogSex,
 } from '../types/geo'
 
 function parseOwnerAgeGroup(group: string): { label: string } | null {
@@ -13,11 +15,17 @@ function parseOwnerAgeGroup(group: string): { label: string } | null {
   return { label: group }
 }
 
+function parseDogGender(value: string): DogSex | null {
+  if (value === 'male' || value === 'female') return value
+  return null
+}
+
 function parseCsv(text: string): {
   breedPrimary: string
   district: number
   dogBirthYear: number
   ownerAgeGroup: string
+  gender: DogSex
 }[] {
   const lines = text.trim().split('\n')
   if (lines.length < 2) return []
@@ -28,6 +36,7 @@ function parseCsv(text: string): {
     district: number
     dogBirthYear: number
     ownerAgeGroup: string
+    gender: DogSex
   }[] = []
 
   for (const line of lines.slice(1)) {
@@ -39,6 +48,7 @@ function parseCsv(text: string): {
     const breedPrimary = row.breed_primary
     const ownerAgeGroup = parseOwnerAgeGroup(row.owner_age_group)
     const dogBirthYear = row.dog_birth_year ? Number(row.dog_birth_year) : null
+    const gender = parseDogGender(row.dog_gender)
 
     if (
       !Number.isInteger(district) ||
@@ -47,7 +57,8 @@ function parseCsv(text: string): {
       !breedPrimary ||
       ownerAgeGroup === null ||
       dogBirthYear === null ||
-      !Number.isFinite(dogBirthYear)
+      !Number.isFinite(dogBirthYear) ||
+      gender === null
     ) {
       continue
     }
@@ -57,6 +68,7 @@ function parseCsv(text: string): {
       breedPrimary,
       dogBirthYear,
       ownerAgeGroup: ownerAgeGroup.label,
+      gender,
     })
   }
 
@@ -97,6 +109,11 @@ export function filterMixedBreeds(records: DogRecord[], includeMixedBreeds: bool
   return records.filter((record) => !isMixedBreed(record.breedPrimary))
 }
 
+export function filterByGender(records: DogRecord[], genderFilter: DogGenderFilter): DogRecord[] {
+  if (genderFilter === 'both') return records
+  return records.filter((record) => record.gender === genderFilter)
+}
+
 function buildDogDataset(csvText: string): DogDataset {
   const parsed = parseCsv(csvText)
   const referenceYear = parsed.length
@@ -108,6 +125,7 @@ function buildDogDataset(csvText: string): DogDataset {
     breedPrimary: record.breedPrimary,
     ownerAgeGroup: record.ownerAgeGroup,
     dogAge: referenceYear - record.dogBirthYear,
+    gender: record.gender,
   }))
 
   return {

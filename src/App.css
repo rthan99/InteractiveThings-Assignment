@@ -104,6 +104,24 @@
   background: var(--color-accent-light);
 }
 
+.map-controls {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-end;
+  max-width: calc(100% - 1rem);
+}
+
+.map-control {
+  padding: 0.35rem 0.45rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--color-border);
+}
+
 .mixed-breed-toggle {
   display: inline-flex;
   align-items: center;
@@ -112,15 +130,66 @@
   user-select: none;
 }
 
-.map-mixed-breed-toggle {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 2;
-  max-width: calc(100% - 1rem);
-  padding: 0.35rem 0.45rem;
-  background: rgba(255, 255, 255, 0.92);
+.gender-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  min-width: 0;
+  border: none;
+}
+
+.gender-toggle.map-control {
+  align-items: flex-start;
+}
+
+.gender-toggle-label {
+  padding: 0;
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.gender-toggle-options {
+  display: inline-flex;
   border: 1px solid var(--color-border);
+}
+
+.gender-toggle-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.gender-toggle-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.gender-toggle-option span {
+  display: block;
+  min-width: 2.25rem;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-border);
+}
+
+.gender-toggle-option:last-child span {
+  border-right: none;
+}
+
+.gender-toggle-option input:checked + span {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.gender-toggle-option input:focus-visible + span {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
 }
 
 .mixed-breed-toggle input {
