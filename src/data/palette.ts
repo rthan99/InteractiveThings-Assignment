@@ -16,7 +16,6 @@ export const PALETTE = {
   accent: '#268BCC',
   accentDark: '#1A5F8A',
   accentLight: '#B8D9EF',
-  water: '#B8D9EF',
 } as const
 
 export const BREED_PALETTE = [

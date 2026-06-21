@@ -56,12 +56,21 @@
 
 .breed-legend {
   flex-shrink: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--color-border);
+}
+
+.breed-legend-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.breed-legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
 }
 
 .breed-legend-item {

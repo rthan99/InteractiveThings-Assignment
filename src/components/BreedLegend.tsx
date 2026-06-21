@@ -11,21 +11,24 @@ export function BreedLegend({ breeds }: BreedLegendProps) {
 
   return (
     <div className="breed-legend" aria-label="Top breed color legend">
-      {breeds.map((breed) => {
-        const color = getBreedColor(breed)
-        return (
-          <div key={breed} className="breed-legend-item">
-            <span
-              className="breed-legend-swatch"
-              style={{
-                backgroundColor: color,
-                borderColor: getBreedBorderColor(breed),
-              }}
-            />
-            <span>{breed}</span>
-          </div>
-        )
-      })}
+      <p className="breed-legend-title">Dominant breed of the kreis</p>
+      <div className="breed-legend-items">
+        {breeds.map((breed) => {
+          const color = getBreedColor(breed)
+          return (
+            <div key={breed} className="breed-legend-item">
+              <span
+                className="breed-legend-swatch"
+                style={{
+                  backgroundColor: color,
+                  borderColor: getBreedBorderColor(breed),
+                }}
+              />
+              <span>{breed}</span>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

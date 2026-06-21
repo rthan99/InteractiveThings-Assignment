@@ -20,7 +20,6 @@ import type {
   DistrictFeature,
   DogDataset,
   DogGenderFilter,
-  LakeCollection,
 } from '../types/geo'
 
 const TITLE = 'Dogs of Zurich'
@@ -35,7 +34,6 @@ interface DistrictState {
 
 export function Visualization() {
   const [geojson, setGeojson] = useState<DistrictCollection | null>(null)
-  const [lakeGeojson, setLakeGeojson] = useState<LakeCollection | null>(null)
   const [dataset, setDataset] = useState<DogDataset | null>(null)
   const [filters, setFilters] = useState<AgeFilters | null>(null)
   const [includeMixedBreeds, setIncludeMixedBreeds] = useState(true)
@@ -51,15 +49,10 @@ export function Visualization() {
         if (!response.ok) throw new Error('Could not load district boundaries')
         return response.json() as Promise<DistrictCollection>
       }),
-      fetch('/data/zurichsee.geojson').then((response) => {
-        if (!response.ok) throw new Error('Could not load lake geometry')
-        return response.json() as Promise<LakeCollection>
-      }),
       loadDogDataset(),
     ])
-      .then(([geoData, lakeData, dogData]) => {
+      .then(([geoData, dogData]) => {
         setGeojson(geoData)
-        setLakeGeojson(lakeData)
         setDataset(dogData)
         setFilters(createDefaultFilters(dogData))
       })
@@ -161,7 +154,6 @@ export function Visualization() {
             </div>
             <ZurichMap
               geojson={geojson}
-              lakeGeojson={lakeGeojson?.features[0] ?? null}
               districtStats={districtStats}
               selectedDistrictId={selected?.district.properties.name ?? null}
               onHover={handleDistrictHover}
