@@ -1,0 +1,43 @@
+:root {
+  --color-bg: #ffffff;
+  --color-text: #268bcc;
+  --color-text-muted: rgba(38, 139, 204, 0.72);
+  --color-border: #268bcc;
+  --color-accent: #268bcc;
+  --color-accent-light: #b8d9ef;
+  --color-accent-dark: #1a5f8a;
+  --color-error: #c53030;
+
+  font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+#root {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+}

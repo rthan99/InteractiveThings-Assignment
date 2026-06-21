@@ -1,0 +1,247 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { AgeExtents, AgeFilters, AgeRange } from '../types/geo'
+import { normalizeAgeRange } from '../data/parseDogData'
+
+interface DiscreteDualRangeSliderProps {
+  label: string
+  range: AgeRange
+  extents: AgeRange
+  onChange: (range: AgeRange) => void
+}
+
+function buildSteps(min: number, max: number): number[] {
+  return Array.from({ length: max - min + 1 }, (_, index) => min + index)
+}
+
+function valueToPercent(value: number, min: number, max: number): number {
+  if (max === min) return 0
+  return ((value - min) / (max - min)) * 100
+}
+
+function snapValue(clientX: number, track: HTMLElement, extents: AgeRange): number {
+  const rect = track.getBoundingClientRect()
+  const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+  return Math.round(extents.min + ratio * (extents.max - extents.min))
+}
+
+function DiscreteDualRangeSlider({ label, range, extents, onChange }: DiscreteDualRangeSliderProps) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const rangeRef = useRef(range)
+  const onChangeRef = useRef(onChange)
+  const [activeThumb, setActiveThumb] = useState<'min' | 'max' | null>(null)
+  rangeRef.current = range
+  onChangeRef.current = onChange
+
+  const steps = useMemo(() => buildSteps(extents.min, extents.max), [extents.min, extents.max])
+  const minPercent = valueToPercent(range.min, extents.min, extents.max)
+  const maxPercent = valueToPercent(range.max, extents.min, extents.max)
+
+  const updateThumb = (thumb: 'min' | 'max', value: number) => {
+    const current = rangeRef.current
+    const next =
+      thumb === 'min'
+        ? normalizeAgeRange({ ...current, min: value }, extents)
+        : normalizeAgeRange({ ...current, max: value }, extents)
+    onChangeRef.current(next)
+  }
+
+  useEffect(() => {
+    if (!activeThumb) return
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const track = trackRef.current
+      if (!track) return
+      updateThumb(activeThumb, snapValue(event.clientX, track, extents))
+    }
+
+    const handlePointerUp = () => setActiveThumb(null)
+
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointercancel', handlePointerUp)
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('pointercancel', handlePointerUp)
+    }
+  }, [activeThumb, extents])
+
+  const handleTrackPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest('.discrete-range-thumb')) return
+
+    const track = trackRef.current
+    if (!track) return
+
+    const value = snapValue(event.clientX, track, extents)
+    const current = rangeRef.current
+    const distanceToMin = Math.abs(value - current.min)
+    const distanceToMax = Math.abs(value - current.max)
+    updateThumb(distanceToMin <= distanceToMax ? 'min' : 'max', value)
+  }
+
+  const handleKeyDown = (thumb: 'min' | 'max') => (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    const current = thumb === 'min' ? range.min : range.max
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+      event.preventDefault()
+      updateThumb(thumb, current - 1)
+    }
+    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      updateThumb(thumb, current + 1)
+    }
+  }
+
+  return (
+    <div className="age-filter">
+      <span className="age-filter-label">{label}</span>
+      <div className="discrete-range">
+        <div
+          ref={trackRef}
+          className="discrete-range-track"
+          onPointerDown={handleTrackPointerDown}
+        >
+          <div className="discrete-range-line" />
+          <div
+            className="discrete-range-fill"
+            style={{ left: `${minPercent}%`, right: `${100 - maxPercent}%` }}
+          />
+          {steps.map((step) => {
+            const inRange = step >= range.min && step <= range.max
+            return (
+              <span
+                key={step}
+                className={`discrete-range-dot${inRange ? ' discrete-range-dot--active' : ''}`}
+                style={{ left: `${valueToPercent(step, extents.min, extents.max)}%` }}
+              />
+            )
+          })}
+          <button
+            type="button"
+            role="slider"
+            className="discrete-range-thumb"
+            style={{ left: `${minPercent}%`, zIndex: activeThumb === 'min' ? 4 : 3 }}
+            aria-label={`${label} minimum`}
+            aria-valuemin={extents.min}
+            aria-valuemax={extents.max}
+            aria-valuenow={range.min}
+            onPointerDown={(event) => {
+              event.stopPropagation()
+              setActiveThumb('min')
+            }}
+            onKeyDown={handleKeyDown('min')}
+          />
+          <button
+            type="button"
+            role="slider"
+            className="discrete-range-thumb"
+            style={{ left: `${maxPercent}%`, zIndex: activeThumb === 'max' ? 4 : 3 }}
+            aria-label={`${label} maximum`}
+            aria-valuemin={extents.min}
+            aria-valuemax={extents.max}
+            aria-valuenow={range.max}
+            onPointerDown={(event) => {
+              event.stopPropagation()
+              setActiveThumb('max')
+            }}
+            onKeyDown={handleKeyDown('max')}
+          />
+        </div>
+        <div className="discrete-range-labels">
+          <span className="discrete-range-value" style={{ left: `${minPercent}%` }}>
+            {range.min}
+          </span>
+          <span className="discrete-range-value" style={{ left: `${maxPercent}%` }}>
+            {range.max}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+interface OwnerAgeGroupCheckboxesProps {
+  groups: string[]
+  selected: string[]
+  onChange: (selected: string[]) => void
+}
+
+function OwnerAgeGroupCheckboxes({ groups, selected, onChange }: OwnerAgeGroupCheckboxesProps) {
+  const selectedSet = new Set(selected)
+
+  const toggleGroup = (group: string) => {
+    const next = selectedSet.has(group)
+      ? selected.filter((value) => value !== group)
+      : [...selected, group].sort((a, b) => Number(a.split('-')[0]) - Number(b.split('-')[0]))
+    onChange(next)
+  }
+
+  return (
+    <div className="age-filter owner-age-filter">
+      <span className="age-filter-label">Owner age</span>
+      <div className="owner-age-groups" role="group" aria-label="Owner age groups">
+        {groups.map((group) => (
+          <label key={group} className="owner-age-option">
+            <input
+              type="checkbox"
+              checked={selectedSet.has(group)}
+              onChange={() => toggleGroup(group)}
+            />
+            <span>{group}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+interface FilterSlidersProps {
+  filters: AgeFilters
+  extents: AgeExtents
+  ownerAgeGroups: string[]
+  matchedCount: number
+  onChange: (filters: AgeFilters) => void
+  onReset: () => void
+}
+
+export function FilterSliders({
+  filters,
+  extents,
+  ownerAgeGroups,
+  matchedCount,
+  onChange,
+  onReset,
+}: FilterSlidersProps) {
+  return (
+    <div className="filter-sliders" aria-label="Age filters">
+      {matchedCount === 0 && (
+        <button type="button" className="filter-reset" onClick={onReset}>
+          Reset filters
+        </button>
+      )}
+      <div className="filter-controls">
+        <DiscreteDualRangeSlider
+          label="Dog age"
+          range={filters.dogAge}
+          extents={extents.dogAge}
+          onChange={(dogAge) =>
+            onChange({
+              ...filters,
+              dogAge: normalizeAgeRange(dogAge, extents.dogAge),
+            })
+          }
+        />
+        <OwnerAgeGroupCheckboxes
+          groups={ownerAgeGroups}
+          selected={filters.ownerAgeGroups}
+          onChange={(ownerAgeGroupsSelection) =>
+            onChange({
+              ...filters,
+              ownerAgeGroups: ownerAgeGroupsSelection,
+            })
+          }
+        />
+      </div>
+    </div>
+  )
+}
