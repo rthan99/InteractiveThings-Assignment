@@ -99,14 +99,21 @@ export function Visualization() {
   ) => {
     if (!district || !position) return
 
-    if (selected?.district.properties.name === district.properties.name) {
-      setSelected(null)
-      return
-    }
-
     setSelected({ district, x: position.x, y: position.y })
     setHovered(null)
   }
+
+  useEffect(() => {
+    if (!selected) return
+
+    const handleClickOutside = () => {
+      setSelected(null)
+      setHovered(null)
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [selected])
 
   return (
     <div className="visualization">
@@ -147,6 +154,7 @@ export function Visualization() {
                 style={{ left: activePopup.x + 14, top: activePopup.y + 14 }}
                 role={selected ? 'dialog' : 'tooltip'}
                 aria-label={`${activeStats.label} breed breakdown`}
+                onClick={(event) => event.stopPropagation()}
               >
                 <strong>{activeStats.label}</strong>
                 <DistrictBreedChart district={activeStats} />
