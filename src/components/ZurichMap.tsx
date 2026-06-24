@@ -12,19 +12,29 @@ interface ZurichMapProps {
   geojson: DistrictCollection
   districtStats: DistrictDogStats[]
   selectedDistrictId: number | null
+  enableHover?: boolean
   onHover: (district: DistrictFeature | null, position: { x: number; y: number } | null) => void
   onSelect: (district: DistrictFeature | null, position: { x: number; y: number } | null) => void
 }
 
-export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover, onSelect }: ZurichMapProps) {
+export function ZurichMap({
+  geojson,
+  districtStats,
+  selectedDistrictId,
+  enableHover = true,
+  onHover,
+  onSelect,
+}: ZurichMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const onHoverRef = useRef(onHover)
   const onSelectRef = useRef(onSelect)
   const selectedDistrictIdRef = useRef(selectedDistrictId)
+  const enableHoverRef = useRef(enableHover)
   onHoverRef.current = onHover
   onSelectRef.current = onSelect
   selectedDistrictIdRef.current = selectedDistrictId
+  enableHoverRef.current = enableHover
 
   useEffect(() => {
     const container = containerRef.current
@@ -89,23 +99,28 @@ export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover,
         .attr('stroke-width', 0.75)
         .attr('cursor', 'pointer')
         .attr('opacity', 1)
-        .on('mouseenter', function (event, feature) {
-          d3.select(this).attr('stroke-width', 1.25)
-          setHighlight(feature.properties.name)
-          onHoverRef.current(feature, getPosition(event))
-        })
-        .on('mousemove', function (event, feature) {
-          onHoverRef.current(feature, getPosition(event))
-        })
-        .on('mouseleave', function () {
-          d3.select(this).attr('stroke-width', 0.75)
-          setHighlight(selectedDistrictIdRef.current)
-          onHoverRef.current(null, null)
-        })
         .on('click', function (event, feature) {
           event.stopPropagation()
           onSelectRef.current(feature, getPosition(event))
         })
+
+      if (enableHoverRef.current) {
+        root
+          .selectAll<SVGPathElement, DistrictFeature>('path.district')
+          .on('mouseenter', function (event, feature) {
+            d3.select(this).attr('stroke-width', 1.25)
+            setHighlight(feature.properties.name)
+            onHoverRef.current(feature, getPosition(event))
+          })
+          .on('mousemove', function (event, feature) {
+            onHoverRef.current(feature, getPosition(event))
+          })
+          .on('mouseleave', function () {
+            d3.select(this).attr('stroke-width', 0.75)
+            setHighlight(selectedDistrictIdRef.current)
+            onHoverRef.current(null, null)
+          })
+      }
 
       root
         .selectAll('text.district-number')
@@ -134,6 +149,7 @@ export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover,
     observer.observe(container)
 
     const handleContainerLeave = (event: MouseEvent) => {
+      if (!enableHoverRef.current) return
       const related = event.relatedTarget as Node | null
       if (related && container.parentElement?.contains(related)) return
       setHighlight(selectedDistrictIdRef.current)
@@ -145,7 +161,7 @@ export function ZurichMap({ geojson, districtStats, selectedDistrictId, onHover,
       observer.disconnect()
       container.removeEventListener('mouseleave', handleContainerLeave)
     }
-  }, [geojson, districtStats, selectedDistrictId])
+  }, [geojson, districtStats, selectedDistrictId, enableHover])
 
   return (
     <div ref={containerRef} className="map-container">

@@ -433,6 +433,38 @@
   font-size: 0.88rem;
 }
 
+.district-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.district-popup-header strong {
+  flex: 1;
+  min-width: 0;
+}
+
+.district-popup-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.district-popup-close:active {
+  background: var(--color-accent-light);
+}
+
 .district-breed-chart {
   display: flex;
   flex-direction: column;
@@ -523,29 +555,133 @@
   color: var(--color-error);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  body,
+  #root {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .app {
-    padding: 0.75rem;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    padding: 0.65rem 0.75rem 1.5rem;
+  }
+
+  .visualization {
+    flex: none;
+    min-height: auto;
   }
 
   .visualization-header h1 {
-    font-size: 2.5rem;
+    font-size: 1.875rem;
+    padding-right: 0;
   }
 
   .visualization-header p {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
+  }
+
+  .visualization-data-note {
+    font-size: 0.75rem;
+  }
+
+  .map-dog-silhouette {
+    display: none;
+  }
+
+  .map-section {
+    flex: none;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .map-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .map-container {
-    height: min(46vh, 440px);
+    order: 1;
+    height: min(58vw, 360px);
+    min-height: 240px;
+  }
+
+  .map-legend-panel {
+    position: static;
+    order: 2;
+    max-width: none;
+    width: 100%;
+    padding: 0.5rem;
+  }
+
+  .breed-legend-items {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+  }
+
+  .district-popup--sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    max-width: none;
+    max-height: min(50vh, 420px);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    box-shadow: 0 -4px 20px rgba(38, 139, 204, 0.15);
+    z-index: 20;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .district-breed-chart-list {
+    max-height: min(220px, 32vh);
   }
 
   .controls-panel {
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
   }
 
-  .map-legend-panel {
-    max-width: min(180px, calc(100% - 1rem));
+  .gender-toggle-options,
+  .mixed-breed-chip {
+    max-width: none;
+  }
+
+  .mixed-breed-chip span {
+    min-height: 2.25rem;
+    font-size: 0.8rem;
+  }
+
+  .gender-toggle-option span,
+  .selection-chip span {
+    min-height: 2.25rem;
+    font-size: 0.8rem;
+  }
+
+  .owner-age-groups--mobile {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .discrete-range-track {
+    height: 3rem;
+  }
+
+  .discrete-range-thumb {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 0.82rem;
   }
 }

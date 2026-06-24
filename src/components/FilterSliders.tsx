@@ -160,9 +160,15 @@ interface OwnerAgeGroupCheckboxesProps {
   groups: string[]
   selected: string[]
   onChange: (selected: string[]) => void
+  isMobile: boolean
 }
 
-function OwnerAgeGroupCheckboxes({ groups, selected, onChange }: OwnerAgeGroupCheckboxesProps) {
+function OwnerAgeGroupCheckboxes({
+  groups,
+  selected,
+  onChange,
+  isMobile,
+}: OwnerAgeGroupCheckboxesProps) {
   const selectedSet = new Set(selected)
 
   const toggleGroup = (group: string) => {
@@ -176,10 +182,14 @@ function OwnerAgeGroupCheckboxes({ groups, selected, onChange }: OwnerAgeGroupCh
     <div className="age-filter owner-age-filter">
       <span className="age-filter-label">Owner age</span>
       <div
-        className="owner-age-groups"
+        className={`owner-age-groups${isMobile ? ' owner-age-groups--mobile' : ''}`}
         role="group"
         aria-label="Owner age groups"
-        style={{ gridTemplateRows: `repeat(${Math.ceil(groups.length / 3)}, auto)` }}
+        style={
+          isMobile
+            ? undefined
+            : { gridTemplateRows: `repeat(${Math.ceil(groups.length / 3)}, auto)` }
+        }
       >
         {groups.map((group) => (
           <label key={group} className="selection-chip owner-age-chip">
@@ -201,6 +211,7 @@ interface FilterSlidersProps {
   extents: AgeExtents
   ownerAgeGroups: string[]
   matchedCount: number
+  isMobile: boolean
   onChange: (filters: AgeFilters) => void
   onReset: () => void
 }
@@ -210,6 +221,7 @@ export function FilterSliders({
   extents,
   ownerAgeGroups,
   matchedCount,
+  isMobile,
   onChange,
   onReset,
 }: FilterSlidersProps) {
@@ -235,6 +247,7 @@ export function FilterSliders({
         <OwnerAgeGroupCheckboxes
           groups={ownerAgeGroups}
           selected={filters.ownerAgeGroups}
+          isMobile={isMobile}
           onChange={(ownerAgeGroupsSelection) =>
             onChange({
               ...filters,

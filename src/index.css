@@ -31,6 +31,7 @@ body {
   height: 100dvh;
   overflow: hidden;
   background: var(--color-bg);
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {

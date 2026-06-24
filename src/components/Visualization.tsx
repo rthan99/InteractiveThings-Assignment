@@ -14,6 +14,7 @@ import {
   loadDogDataset,
 } from '../data/parseDogData'
 import { formatCount } from '../formatCount'
+import { useIsMobile } from '../hooks/useIsMobile'
 import type {
   AgeFilters,
   DistrictCollection,
@@ -34,6 +35,7 @@ interface DistrictState {
 }
 
 export function Visualization() {
+  const isMobile = useIsMobile()
   const [geojson, setGeojson] = useState<DistrictCollection | null>(null)
   const [dataset, setDataset] = useState<DogDataset | null>(null)
   const [filters, setFilters] = useState<AgeFilters | null>(null)
@@ -91,7 +93,7 @@ export function Visualization() {
     [districtStats],
   )
 
-  const activePopup = selected ?? hovered
+  const activePopup = isMobile ? selected : (selected ?? hovered)
 
   const activeStats = activePopup
     ? districtStats.find((district) => district.id === activePopup.district.properties.name)
@@ -131,7 +133,7 @@ export function Visualization() {
   }, [selected])
 
   return (
-    <div className="visualization">
+    <div className={`visualization${isMobile ? ' visualization--mobile' : ''}`}>
       <header className="visualization-header">
         <h1>{TITLE}</h1>
         <p>
@@ -166,6 +168,7 @@ export function Visualization() {
               geojson={geojson}
               districtStats={districtStats}
               selectedDistrictId={selected?.district.properties.name ?? null}
+              enableHover={!isMobile}
               onHover={handleDistrictHover}
               onSelect={handleDistrictSelect}
             />
@@ -177,13 +180,32 @@ export function Visualization() {
             )}
             {activeStats && activePopup && (
               <div
-                className={`district-popup${selected ? ' district-popup--pinned' : ''}`}
-                style={{ left: activePopup.x + 14, top: activePopup.y + 14 }}
+                className={`district-popup${selected ? ' district-popup--pinned' : ''}${isMobile ? ' district-popup--sheet' : ''}`}
+                style={
+                  isMobile
+                    ? undefined
+                    : { left: activePopup.x + 14, top: activePopup.y + 14 }
+                }
                 role={selected ? 'dialog' : 'tooltip'}
                 aria-label={`${activeStats.label} breed breakdown`}
                 onClick={(event) => event.stopPropagation()}
               >
-                <strong>{activeStats.label}</strong>
+                <div className="district-popup-header">
+                  <strong>{activeStats.label}</strong>
+                  {isMobile && selected && (
+                    <button
+                      type="button"
+                      className="district-popup-close"
+                      aria-label="Close district details"
+                      onClick={() => {
+                        setSelected(null)
+                        setHovered(null)
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
                 <DistrictBreedChart district={activeStats} />
               </div>
             )}
@@ -199,6 +221,7 @@ export function Visualization() {
               extents={dataset.ageExtents}
               ownerAgeGroups={dataset.ownerAgeGroups}
               matchedCount={filteredRecords.length}
+              isMobile={isMobile}
               onChange={setFilters}
               onReset={() => setFilters(createDefaultFilters(dataset))}
             />
