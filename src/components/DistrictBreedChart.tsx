@@ -1,14 +1,34 @@
-import { useState } from 'react'
-import { getBreedColor } from '../data/palette'
+import { useMemo, useState } from 'react'
+import { getBreedColor, PALETTE } from '../data/palette'
 import { formatCount } from '../formatCount'
-import type { DistrictDogStats } from '../types/geo'
+import type { BreedRank, DistrictDogStats } from '../types/geo'
+
+const TOP_BREED_COUNT = 10
+const OTHERS_LABEL = 'Others'
 
 function shortenBreedName(breed: string): string {
+  if (breed === OTHERS_LABEL) return OTHERS_LABEL
   return breed
     .replace('Mixed breed (small)', 'Mixed (small)')
     .replace('Mixed breed (large)', 'Mixed (large)')
     .replace('Mixed breed (unspecified size)', 'Mixed (unspecified)')
     .replace(' Retriever', '')
+}
+
+function buildDisplayedBreeds(breeds: BreedRank[]): BreedRank[] {
+  if (breeds.length <= TOP_BREED_COUNT) return breeds
+
+  const topBreeds = breeds.slice(0, TOP_BREED_COUNT)
+  const othersCount = breeds.slice(TOP_BREED_COUNT).reduce((sum, entry) => sum + entry.count, 0)
+
+  if (othersCount === 0) return topBreeds
+
+  return [...topBreeds, { breed: OTHERS_LABEL, count: othersCount }]
+}
+
+function getBarColor(breed: string): string {
+  if (breed === OTHERS_LABEL) return PALETTE.accentLight
+  return getBreedColor(breed)
 }
 
 interface DistrictBreedChartProps {
@@ -18,11 +38,16 @@ interface DistrictBreedChartProps {
 export function DistrictBreedChart({ district }: DistrictBreedChartProps) {
   const [hoveredBreed, setHoveredBreed] = useState<string | null>(null)
 
+  const displayedBreeds = useMemo(
+    () => buildDisplayedBreeds(district.breeds),
+    [district.breeds],
+  )
+
   if (district.totalDogs === 0) {
     return <p className="district-breed-chart-empty">No dogs match the current filters</p>
   }
 
-  const maxCount = district.breeds[0]?.count ?? 1
+  const maxCount = displayedBreeds[0]?.count ?? 1
 
   return (
     <div className="district-breed-chart">
@@ -30,7 +55,7 @@ export function DistrictBreedChart({ district }: DistrictBreedChartProps) {
         {formatCount(district.totalDogs)} dogs
       </p>
       <div className="district-breed-chart-list" aria-label="Breeds in district">
-        {district.breeds.map(({ breed, count }) => (
+        {displayedBreeds.map(({ breed, count }) => (
           <div
             key={breed}
             className="district-breed-row"
@@ -49,7 +74,7 @@ export function DistrictBreedChart({ district }: DistrictBreedChartProps) {
                   className="district-breed-fill"
                   style={{
                     width: `${(count / maxCount) * 100}%`,
-                    backgroundColor: getBreedColor(breed),
+                    backgroundColor: getBarColor(breed),
                   }}
                 />
               </div>
