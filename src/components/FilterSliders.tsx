@@ -170,6 +170,7 @@ function OwnerAgeGroupCheckboxes({
   isMobile,
 }: OwnerAgeGroupCheckboxesProps) {
   const selectedSet = new Set(selected)
+  const allSelected = groups.length > 0 && selected.length === groups.length
 
   const toggleGroup = (group: string) => {
     const next = selectedSet.has(group)
@@ -178,9 +179,18 @@ function OwnerAgeGroupCheckboxes({
     onChange(next)
   }
 
+  const toggleAll = () => {
+    onChange(allSelected ? [] : [...groups])
+  }
+
   return (
     <div className="age-filter owner-age-filter">
-      <span className="age-filter-label">Owner age</span>
+      <div className="age-filter-header">
+        <span className="age-filter-label">Owner age</span>
+        <button type="button" className="age-filter-action" onClick={toggleAll}>
+          {allSelected ? 'Deselect all' : 'Select all'}
+        </button>
+      </div>
       <div
         className={`owner-age-groups${isMobile ? ' owner-age-groups--mobile' : ''}`}
         role="group"
