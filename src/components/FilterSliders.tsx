@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { MixedBreedToggle } from './MixedBreedToggle'
 import type { AgeExtents, AgeFilters, AgeRange } from '../types/geo'
-import { normalizeAgeRange } from '../data/parseDogData'
+import { formatOwnerAgeGroupLabel, normalizeAgeRange } from '../data/parseDogData'
 
 interface DiscreteDualRangeSliderProps {
   label: string
@@ -93,7 +94,7 @@ function DiscreteDualRangeSlider({ label, range, extents, onChange }: DiscreteDu
   }
 
   return (
-    <div className="age-filter">
+    <div className={`age-filter${label === 'Dog age' ? ' dog-age-filter' : ''}`}>
       <span className="age-filter-label">{label}</span>
       <div className="discrete-range">
         <div
@@ -208,7 +209,17 @@ function OwnerAgeGroupCheckboxes({
               checked={selectedSet.has(group)}
               onChange={() => toggleGroup(group)}
             />
-            <span>{group}</span>
+            <span title={`Ages ${group}`}>
+              {group === '11-20' ? (
+                <>
+                  Under
+                  <br />
+                  20
+                </>
+              ) : (
+                formatOwnerAgeGroupLabel(group)
+              )}
+            </span>
           </label>
         ))}
       </div>
@@ -221,8 +232,10 @@ interface FilterSlidersProps {
   extents: AgeExtents
   ownerAgeGroups: string[]
   matchedCount: number
+  includeMixedBreeds: boolean
   isMobile: boolean
   onChange: (filters: AgeFilters) => void
+  onIncludeMixedBreedsChange: (include: boolean) => void
   onReset: () => void
 }
 
@@ -231,41 +244,55 @@ export function FilterSliders({
   extents,
   ownerAgeGroups,
   matchedCount,
+  includeMixedBreeds,
   isMobile,
   onChange,
+  onIncludeMixedBreedsChange,
   onReset,
 }: FilterSlidersProps) {
   return (
-    <div className="filter-sliders" aria-label="Age filters">
+    <>
       {matchedCount === 0 && (
-        <button type="button" className="filter-reset" onClick={onReset}>
-          Reset filters
-        </button>
+        <div className="controls-reset">
+          <button type="button" className="filter-reset" onClick={onReset}>
+            Reset filters
+          </button>
+        </div>
       )}
-      <div className="filter-controls">
-        <DiscreteDualRangeSlider
-          label="Dog age"
-          range={filters.dogAge}
-          extents={extents.dogAge}
-          onChange={(dogAge) =>
-            onChange({
-              ...filters,
-              dogAge: normalizeAgeRange(dogAge, extents.dogAge),
-            })
-          }
-        />
-        <OwnerAgeGroupCheckboxes
-          groups={ownerAgeGroups}
-          selected={filters.ownerAgeGroups}
-          isMobile={isMobile}
-          onChange={(ownerAgeGroupsSelection) =>
-            onChange({
-              ...filters,
-              ownerAgeGroups: ownerAgeGroupsSelection,
-            })
-          }
-        />
+      <div className="controls-columns">
+        <div className="controls-section controls-section--owner">
+          <OwnerAgeGroupCheckboxes
+            groups={ownerAgeGroups}
+            selected={filters.ownerAgeGroups}
+            isMobile={isMobile}
+            onChange={(ownerAgeGroupsSelection) =>
+              onChange({
+                ...filters,
+                ownerAgeGroups: ownerAgeGroupsSelection,
+              })
+            }
+          />
+        </div>
+        <div className="controls-section controls-section--dog">
+          <DiscreteDualRangeSlider
+            label="Dog age"
+            range={filters.dogAge}
+            extents={extents.dogAge}
+            onChange={(dogAge) =>
+              onChange({
+                ...filters,
+                dogAge: normalizeAgeRange(dogAge, extents.dogAge),
+              })
+            }
+          />
+        </div>
+        <div className="controls-section controls-section--mixed">
+          <MixedBreedToggle
+            checked={includeMixedBreeds}
+            onChange={onIncludeMixedBreedsChange}
+          />
+        </div>
       </div>
-    </div>
+    </>
   )
 }

@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { BreedLegend } from './BreedLegend'
-import { MixedBreedToggle } from './MixedBreedToggle'
 import { DistrictBreedChart } from './DistrictBreedChart'
 import { FilterSliders } from './FilterSliders'
 import { ZurichMap } from './ZurichMap'
@@ -260,17 +259,16 @@ export function Visualization() {
             )}
           </div>
 
-          <div className="controls-panel">
-            <div className="map-controls">
-              <MixedBreedToggle checked={includeMixedBreeds} onChange={setIncludeMixedBreeds} />
-            </div>
+          <div className="controls-panel" aria-label="Filters">
             <FilterSliders
               filters={filters}
               extents={dataset.ageExtents}
               ownerAgeGroups={dataset.ownerAgeGroups}
               matchedCount={filteredRecords.length}
+              includeMixedBreeds={includeMixedBreeds}
               isMobile={isMobile}
               onChange={setFilters}
+              onIncludeMixedBreedsChange={setIncludeMixedBreeds}
               onReset={() => setFilters(createDefaultFilters(dataset))}
             />
           </div>

@@ -94,6 +94,17 @@ function computeOwnerAgeGroups(records: DogRecord[]): string[] {
   )
 }
 
+export function formatOwnerAgeGroupLabel(group: string): string {
+  const match = group.match(/^(\d+)-(\d+)$/)
+  if (!match) return group
+
+  const start = Number(match[1])
+  if (start < 21) return 'Under 20'
+
+  const decade = Math.floor(start / 10) * 10
+  return `${decade}s`
+}
+
 export function normalizeAgeRange(range: AgeRange, extents: AgeRange): AgeRange {
   const min = Math.round(Math.max(extents.min, Math.min(range.min, range.max)))
   const max = Math.round(Math.min(extents.max, Math.max(range.min, range.max)))

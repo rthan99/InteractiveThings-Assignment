@@ -112,28 +112,89 @@
 }
 
 .controls-panel {
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1.25rem 2rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--color-border);
-  align-items: start;
-}
-
-.filter-sliders {
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  margin: 0.75rem -0.75rem -0.75rem;
+  padding: 0 0.75rem 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.controls-reset {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--color-accent-light);
+}
+
+.controls-columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  position: relative;
+}
+
+.controls-columns::before,
+.controls-columns::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-accent-light);
+  pointer-events: none;
+}
+
+.controls-columns::before {
+  left: calc(100% / 3);
+}
+
+.controls-columns::after {
+  left: calc(200% / 3);
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 0.75rem;
   min-width: 0;
+  min-height: 100%;
+}
+
+.controls-section .age-filter {
+  align-items: center;
+  width: 100%;
+}
+
+.controls-section .age-filter-label {
+  text-align: center;
+}
+
+.controls-section .owner-age-filter {
+  align-items: center;
+}
+
+.controls-section .owner-age-groups {
+  margin-inline: auto;
+}
+
+.controls-section .dog-age-filter .discrete-range {
+  margin-inline: auto;
+}
+
+.controls-section .mixed-breed-chip {
+  margin-inline: auto;
 }
 
 .filter-reset {
-  align-self: flex-start;
   flex-shrink: 0;
   padding: 0.25rem 0.55rem;
   border: 1px solid var(--color-border);
@@ -146,22 +207,6 @@
 
 .filter-reset:hover {
   background: var(--color-accent-light);
-}
-
-.map-controls {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.65rem;
-  min-width: 0;
-  width: 100%;
-}
-
-.map-control {
-  padding: 0;
-  background: transparent;
-  border: none;
 }
 
 .selection-chip {
@@ -193,6 +238,13 @@
   color: var(--color-text);
   background: var(--color-bg);
   border: 1px solid var(--color-border);
+  border-radius: 0.45rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.selection-chip:hover input:not(:checked) + span {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
 }
 
 .selection-chip input:checked + span {
@@ -207,22 +259,20 @@
 }
 
 .mixed-breed-chip {
-  width: 100%;
-  max-width: 14rem;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .mixed-breed-chip span {
   min-height: 1.85rem;
-  padding: 0.3rem 0.5rem;
+  padding: 0.35rem 0.75rem;
   font-size: 0.76rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(38, 139, 204, 0.08);
 }
 
-.filter-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  max-width: none;
-  width: 100%;
+.mixed-breed-chip input:checked + span {
+  box-shadow: 0 1px 3px rgba(38, 139, 204, 0.2);
 }
 
 .owner-age-filter .age-filter-label {
@@ -246,6 +296,7 @@
   flex-shrink: 0;
   padding: 0.15rem 0.45rem;
   border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
   background: var(--color-bg);
   color: var(--color-text);
   font: inherit;
@@ -254,6 +305,7 @@
   line-height: 1.2;
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .age-filter-action:hover {
@@ -281,6 +333,12 @@
   padding: 0.15rem;
   font-size: 0.62rem;
   line-height: 1.15;
+  border-radius: 0.55rem;
+  box-shadow: 0 1px 2px rgba(38, 139, 204, 0.08);
+}
+
+.owner-age-chip input:checked + span {
+  box-shadow: 0 1px 3px rgba(38, 139, 204, 0.2);
 }
 
 .age-filter {
@@ -298,6 +356,10 @@
 .discrete-range {
   max-width: none;
   width: 100%;
+}
+
+.dog-age-filter .discrete-range {
+  max-width: 10.5rem;
 }
 
 .discrete-range-track {
@@ -652,19 +714,35 @@
   }
 
   .controls-panel {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    margin-top: 0.35rem;
-    padding: 0.45rem 0.25rem 0;
+    flex: none;
+    margin: 0.35rem 0 0;
+    padding: 0;
     border-top-width: 1px;
   }
 
-  .map-controls {
-    gap: 0.4rem;
+  .controls-columns {
+    flex: none;
+    display: flex;
+    flex-direction: column;
   }
 
-  .filter-controls {
-    gap: 0.4rem;
+  .controls-columns::before,
+  .controls-columns::after {
+    display: none;
+  }
+
+  .controls-section {
+    padding: 0.55rem 0;
+    min-height: 0;
+  }
+
+  .controls-section--dog,
+  .controls-section--mixed {
+    border-top: 1px solid var(--color-accent-light);
+  }
+
+  .controls-reset {
+    border-bottom: 1px solid var(--color-accent-light);
   }
 
   .age-filter {
@@ -680,14 +758,14 @@
     padding: 0.12rem 0.35rem;
   }
 
-  .mixed-breed-chip {
-    max-width: 100%;
-  }
-
   .mixed-breed-chip span {
     min-height: 1.65rem;
-    padding: 0.25rem 0.4rem;
+    padding: 0.3rem 0.65rem;
     font-size: 0.7rem;
+  }
+
+  .dog-age-filter .discrete-range {
+    max-width: min(10.5rem, 72vw);
   }
 
   .owner-age-groups--mobile {
@@ -700,6 +778,7 @@
     height: 2.55rem;
     min-height: 0;
     font-size: 0.58rem;
+    border-radius: 0.5rem;
   }
 
   .discrete-range-track {
