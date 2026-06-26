@@ -725,24 +725,37 @@
 }
 
 @media (max-width: 768px) {
+  html {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body,
   #root {
     height: auto;
     min-height: 100dvh;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: visible;
   }
 
   .app {
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-    padding: 0.65rem 0.75rem 1.5rem;
+    padding: 0.65rem 0.75rem 2rem;
   }
 
   .visualization {
     flex: none;
     min-height: auto;
+    overflow: visible;
+  }
+
+  .visualization--mobile {
+    overflow: visible;
   }
 
   .visualization-header h1 {
@@ -768,12 +781,14 @@
     padding: 0.5rem;
     display: flex;
     flex-direction: column;
+    overflow: visible;
   }
 
   .district-detail-panel {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
   }
 
   .district-detail-panel--visible {
@@ -795,13 +810,11 @@
     color: var(--color-text);
     font-size: 0.78rem;
     border: 1px solid var(--color-border);
-    overflow: hidden;
-    max-height: min(46vh, 360px);
     opacity: 0;
     transform: translateY(-0.65rem);
     transition:
       opacity 0.38s ease,
-      transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+      transform 0.42s cubic-bezier(0.4, 0, 0.36, 1);
   }
 
   .district-detail-panel--visible .district-detail-panel__content {
@@ -809,30 +822,22 @@
     transform: translateY(0);
   }
 
-  .district-detail-panel .district-breed-chart {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-  }
-
   .district-detail-panel .district-breed-chart-list {
     max-height: none;
-    flex: 1;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding-right: 0.2rem;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .map-main {
+    flex: none;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
 
   .map-container {
+    flex: none;
     order: 1;
     height: min(58vw, 360px);
     min-height: 240px;
@@ -867,14 +872,7 @@
   }
 
   .district-breed-chart-list {
-    max-height: min(200px, 28vh);
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-
-  .visualization--mobile {
+    max-height: none;
     overflow: visible;
   }
 
