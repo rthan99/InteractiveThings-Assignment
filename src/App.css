@@ -766,6 +766,50 @@
     flex: none;
     margin-top: 0.5rem;
     padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .district-detail-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .district-detail-panel--visible {
+    grid-template-rows: 1fr;
+  }
+
+  .district-detail-panel__inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .district-detail-panel__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+    padding: 0.55rem 0.65rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.78rem;
+    border: 1px solid var(--color-border);
+    overflow-x: hidden;
+    opacity: 0;
+    transform: translateY(-0.65rem);
+    transition:
+      opacity 0.38s ease,
+      transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .district-detail-panel--visible .district-detail-panel__content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .district-detail-panel .district-breed-chart-list {
+    max-height: min(220px, 34vh);
   }
 
   .map-main {
@@ -808,12 +852,6 @@
     gap: 0.25rem 0.5rem;
   }
 
-  .district-popup--mobile {
-    max-height: min(50vh, 320px);
-    padding: 0.55rem 0.65rem;
-    font-size: 0.78rem;
-  }
-
   .district-breed-chart-list {
     max-height: min(200px, 28vh);
   }
@@ -824,6 +862,7 @@
     padding: 0;
     border-top-width: 1px;
     border-top-color: rgba(255, 255, 255, 0.4);
+    transition: margin-top 0.42s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .controls-panel .controls-section--dog,

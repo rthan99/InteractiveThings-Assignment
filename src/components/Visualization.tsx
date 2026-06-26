@@ -18,6 +18,7 @@ import type {
   DistrictCollection,
   DistrictFeature,
   DogDataset,
+  DistrictDogStats,
 } from '../types/geo'
 
 const TITLE = 'Dogs of Zurich'
@@ -25,10 +26,46 @@ const SUBTITLE_INTRO = 'Zurich has 12 districts, or formally known as "Kreise".'
 const SUBTITLE_DETAIL =
   'As you explore this map, each district will show its most common breed.'
 
+const MOBILE_DETAIL_PANEL_MS = 420
+
 interface DistrictState {
   district: DistrictFeature
   x: number
   y: number
+}
+
+interface DistrictDetailBodyProps {
+  stats: DistrictDogStats
+  showClose?: boolean
+  onClose?: () => void
+}
+
+function DistrictDetailBody({ stats, showClose = false, onClose }: DistrictDetailBodyProps) {
+  return (
+    <>
+      <div className="district-popup-header">
+        <div className="district-popup-title">
+          <strong>{stats.label}</strong>
+          {stats.totalDogs > 0 && (
+            <span className="district-popup-dog-count">
+              {formatCount(stats.totalDogs)} dogs
+            </span>
+          )}
+        </div>
+        {showClose && onClose && (
+          <button
+            type="button"
+            className="district-popup-close"
+            aria-label="Close district details"
+            onClick={onClose}
+          >
+            ×
+          </button>
+        )}
+      </div>
+      <DistrictBreedChart district={stats} />
+    </>
+  )
 }
 
 export function Visualization() {
@@ -39,6 +76,8 @@ export function Visualization() {
   const [includeMixedBreeds, setIncludeMixedBreeds] = useState(true)
   const [hovered, setHovered] = useState<DistrictState | null>(null)
   const [selected, setSelected] = useState<DistrictState | null>(null)
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false)
+  const [mobilePanelStats, setMobilePanelStats] = useState<DistrictDogStats | null>(null)
   const [popupPosition, setPopupPosition] = useState<{ left: number; top: number } | null>(null)
   const mapMainRef = useRef<HTMLDivElement>(null)
   const popupRef = useRef<HTMLDivElement>(null)
@@ -129,6 +168,28 @@ export function Visualization() {
   }
 
   useEffect(() => {
+    if (!isMobile) {
+      setMobilePanelOpen(false)
+      setMobilePanelStats(null)
+      return
+    }
+
+    if (selected && activeStats) {
+      setMobilePanelStats(activeStats)
+      const frame = requestAnimationFrame(() => setMobilePanelOpen(true))
+      return () => cancelAnimationFrame(frame)
+    }
+
+    setMobilePanelOpen(false)
+  }, [activeStats, isMobile, selected])
+
+  useEffect(() => {
+    if (!isMobile || mobilePanelOpen || !mobilePanelStats) return
+    const timeout = window.setTimeout(() => setMobilePanelStats(null), MOBILE_DETAIL_PANEL_MS)
+    return () => window.clearTimeout(timeout)
+  }, [isMobile, mobilePanelOpen, mobilePanelStats])
+
+  useEffect(() => {
     if (!selected) return
 
     const handleClickOutside = () => {
@@ -140,7 +201,7 @@ export function Visualization() {
   }, [selected])
 
   useLayoutEffect(() => {
-    if (!activePopup || !mapMainRef.current) {
+    if (isMobile || !activePopup || !mapMainRef.current) {
       setPopupPosition(null)
       return
     }
@@ -236,47 +297,49 @@ export function Visualization() {
                 below.
               </div>
             )}
-            {activeStats && activePopup && (
+            {!isMobile && activeStats && activePopup && (
               <div
                 ref={popupRef}
-                className={`district-popup${selected ? ' district-popup--pinned' : ''}${isMobile ? ' district-popup--mobile' : ''}`}
+                className={`district-popup${selected ? ' district-popup--pinned' : ''}`}
                 style={{
                   left: popupPosition?.left ?? activePopup.x + 14,
                   top: popupPosition?.top ?? activePopup.y + 14,
-                  width: isMobile
-                    ? `min(280px, calc(100% - ${24}px))`
-                    : 'min(340px, calc(100% - 1rem))',
+                  width: 'min(340px, calc(100% - 1rem))',
                 }}
                 role={selected ? 'dialog' : 'tooltip'}
                 aria-label={`${activeStats.label} breed breakdown`}
                 onClick={(event) => event.stopPropagation()}
               >
-                <div className="district-popup-header">
-                  <div className="district-popup-title">
-                    <strong>{activeStats.label}</strong>
-                    {activeStats.totalDogs > 0 && (
-                      <span className="district-popup-dog-count">
-                        {formatCount(activeStats.totalDogs)} dogs
-                      </span>
-                    )}
-                  </div>
-                  {selected && (
-                    <button
-                      type="button"
-                      className="district-popup-close"
-                      aria-label="Close district details"
-                      onClick={() => {
-                        clearDistrictSelection()
-                      }}
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-                <DistrictBreedChart district={activeStats} />
+                <DistrictDetailBody
+                  stats={activeStats}
+                  showClose={Boolean(selected)}
+                  onClose={clearDistrictSelection}
+                />
               </div>
             )}
           </div>
+
+          {isMobile && mobilePanelStats && (
+            <div
+              className={`district-detail-panel${mobilePanelOpen ? ' district-detail-panel--visible' : ''}`}
+              aria-hidden={!mobilePanelOpen}
+            >
+              <div className="district-detail-panel__inner">
+                <div
+                  className="district-detail-panel__content"
+                  role="dialog"
+                  aria-label={`${mobilePanelStats.label} breed breakdown`}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <DistrictDetailBody
+                    stats={mobilePanelStats}
+                    showClose
+                    onClose={clearDistrictSelection}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="controls-panel" aria-label="Filters">
             <FilterSliders
