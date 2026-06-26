@@ -81,6 +81,7 @@ export function Visualization() {
   const [popupPosition, setPopupPosition] = useState<{ left: number; top: number } | null>(null)
   const mapMainRef = useRef<HTMLDivElement>(null)
   const popupRef = useRef<HTMLDivElement>(null)
+  const mobileDetailPanelRef = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -188,6 +189,14 @@ export function Visualization() {
     const timeout = window.setTimeout(() => setMobilePanelStats(null), MOBILE_DETAIL_PANEL_MS)
     return () => window.clearTimeout(timeout)
   }, [isMobile, mobilePanelOpen, mobilePanelStats])
+
+  useEffect(() => {
+    if (!isMobile || !mobilePanelOpen || !mobileDetailPanelRef.current) return
+    const timeout = window.setTimeout(() => {
+      mobileDetailPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, MOBILE_DETAIL_PANEL_MS / 2)
+    return () => window.clearTimeout(timeout)
+  }, [isMobile, mobilePanelOpen])
 
   useEffect(() => {
     if (!selected) return
@@ -321,6 +330,7 @@ export function Visualization() {
 
           {isMobile && mobilePanelStats && (
             <div
+              ref={mobileDetailPanelRef}
               className={`district-detail-panel${mobilePanelOpen ? ' district-detail-panel--visible' : ''}`}
               aria-hidden={!mobilePanelOpen}
             >
