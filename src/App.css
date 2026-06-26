@@ -139,7 +139,7 @@
 }
 
 .controls-panel .age-filter-action {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.75);
   color: #ffffff;
 }
@@ -166,7 +166,7 @@
 
 .controls-panel .selection-chip span {
   color: #ffffff;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.75);
   box-shadow: none;
 }

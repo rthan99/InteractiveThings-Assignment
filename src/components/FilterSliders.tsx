@@ -218,35 +218,23 @@ interface FilterSlidersProps {
   filters: AgeFilters
   extents: AgeExtents
   ownerAgeGroups: string[]
-  matchedCount: number
   includeMixedBreeds: boolean
   isMobile: boolean
   onChange: (filters: AgeFilters) => void
   onIncludeMixedBreedsChange: (include: boolean) => void
-  onReset: () => void
 }
 
 export function FilterSliders({
   filters,
   extents,
   ownerAgeGroups,
-  matchedCount,
   includeMixedBreeds,
   isMobile,
   onChange,
   onIncludeMixedBreedsChange,
-  onReset,
 }: FilterSlidersProps) {
   return (
-    <>
-      {matchedCount === 0 && (
-        <div className="controls-reset">
-          <button type="button" className="filter-reset" onClick={onReset}>
-            Reset filters
-          </button>
-        </div>
-      )}
-      <div className="controls-columns">
+    <div className="controls-columns">
         <div className="controls-section controls-section--owner">
           <OwnerAgeGroupCheckboxes
             groups={ownerAgeGroups}
@@ -279,7 +267,6 @@ export function FilterSliders({
             onChange={onIncludeMixedBreedsChange}
           />
         </div>
-      </div>
-    </>
+    </div>
   )
 }

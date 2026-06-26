@@ -232,8 +232,8 @@ export function Visualization() {
             />
             {filteredRecords.length === 0 && (
               <div className="map-empty-state" role="status">
-                No dogs match the current filters. Adjust the filters, mixed breed setting, or reset
-                filters below.
+                No dogs match the current filters. Adjust the filters or mixed breed setting
+                below.
               </div>
             )}
             {activeStats && activePopup && (
@@ -283,12 +283,10 @@ export function Visualization() {
               filters={filters}
               extents={dataset.ageExtents}
               ownerAgeGroups={dataset.ownerAgeGroups}
-              matchedCount={filteredRecords.length}
               includeMixedBreeds={includeMixedBreeds}
               isMobile={isMobile}
               onChange={setFilters}
               onIncludeMixedBreedsChange={setIncludeMixedBreeds}
-              onReset={() => setFilters(createDefaultFilters(dataset))}
             />
           </div>
         </section>
