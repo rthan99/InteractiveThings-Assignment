@@ -104,13 +104,27 @@ export function Visualization() {
     setHovered(null)
   }
 
+  const clearDistrictSelection = () => {
+    setSelected(null)
+    setHovered(null)
+  }
+
   const handleDistrictSelect = (
     district: DistrictFeature | null,
     position: { x: number; y: number } | null,
   ) => {
     if (!district || !position) return
 
-    setSelected({ district, x: position.x, y: position.y })
+    if (selected?.district.properties.name === district.properties.name) {
+      clearDistrictSelection()
+      return
+    }
+
+    setSelected({
+      district,
+      x: position.x,
+      y: position.y,
+    })
     setHovered(null)
   }
 
@@ -118,8 +132,7 @@ export function Visualization() {
     if (!selected) return
 
     const handleClickOutside = () => {
-      setSelected(null)
-      setHovered(null)
+      clearDistrictSelection()
     }
 
     document.addEventListener('click', handleClickOutside)
@@ -239,15 +252,21 @@ export function Visualization() {
                 onClick={(event) => event.stopPropagation()}
               >
                 <div className="district-popup-header">
-                  <strong>{activeStats.label}</strong>
+                  <div className="district-popup-title">
+                    <strong>{activeStats.label}</strong>
+                    {activeStats.totalDogs > 0 && (
+                      <span className="district-popup-dog-count">
+                        {formatCount(activeStats.totalDogs)} dogs
+                      </span>
+                    )}
+                  </div>
                   {selected && (
                     <button
                       type="button"
                       className="district-popup-close"
                       aria-label="Close district details"
                       onClick={() => {
-                        setSelected(null)
-                        setHovered(null)
+                        clearDistrictSelection()
                       }}
                     >
                       ×

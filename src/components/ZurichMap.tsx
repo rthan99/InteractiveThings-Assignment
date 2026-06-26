@@ -14,7 +14,10 @@ interface ZurichMapProps {
   selectedDistrictId: number | null
   enableHover?: boolean
   onHover: (district: DistrictFeature | null, position: { x: number; y: number } | null) => void
-  onSelect: (district: DistrictFeature | null, position: { x: number; y: number } | null) => void
+  onSelect: (
+    district: DistrictFeature | null,
+    position: { x: number; y: number } | null,
+  ) => void
 }
 
 export function ZurichMap({
@@ -143,7 +146,6 @@ export function ZurichMap({
     }
 
     render()
-    requestAnimationFrame(render)
 
     const observer = new ResizeObserver(render)
     observer.observe(container)

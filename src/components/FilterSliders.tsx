@@ -196,11 +196,6 @@ function OwnerAgeGroupCheckboxes({
         className={`owner-age-groups${isMobile ? ' owner-age-groups--mobile' : ''}`}
         role="group"
         aria-label="Owner age groups"
-        style={
-          isMobile
-            ? undefined
-            : { gridTemplateRows: `repeat(${Math.ceil(groups.length / 3)}, auto)` }
-        }
       >
         {groups.map((group) => (
           <label key={group} className="selection-chip owner-age-chip">
@@ -210,15 +205,7 @@ function OwnerAgeGroupCheckboxes({
               onChange={() => toggleGroup(group)}
             />
             <span title={`Ages ${group}`}>
-              {group === '11-20' ? (
-                <>
-                  Under
-                  <br />
-                  20
-                </>
-              ) : (
-                formatOwnerAgeGroupLabel(group)
-              )}
+              {group === '11-20' ? 'Under 20' : formatOwnerAgeGroupLabel(group)}
             </span>
           </label>
         ))}
